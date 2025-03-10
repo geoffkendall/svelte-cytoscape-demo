@@ -1,5 +1,9 @@
 // Define the styles as a proper Cytoscape stylesheet
-const graphStyles = [
+// Use explicit type annotation for the stylesheet
+const graphStyles: Array<{
+  selector: string;
+  style: Record<string, any>;
+}> = [
   {
     selector: 'node',
     style: {
@@ -15,7 +19,7 @@ const graphStyles = [
       'border-color': 'orange',
       'border-width': '3',
       'color': 'darkred'
-    } as any
+    }
   },
   {
     selector: 'node:selected',
@@ -25,7 +29,7 @@ const graphStyles = [
       'border-color': 'darkred',
       'line-color': '#0e76ba',
       'target-arrow-color': '#0e76ba'
-    } as any
+    }
   },
   {
     selector: 'edge',
@@ -35,26 +39,26 @@ const graphStyles = [
       'text-background-color': '#ffffff',
       'text-background-opacity': '1',
       'text-background-padding': '3',
-      'width': '6',
+      'width': '2',
       'target-arrow-shape': 'triangle',
       'line-color': 'darkred',
       'target-arrow-color': 'darkred',
-      'arrow-scale': 2,
+      'arrow-scale': 1,
       'font-weight': 'bold'
-    } as any
+    }
   },
   {
     selector: 'edge[label]',
     style: {
       'content': 'data(label)'
-    } as any
+    }
   },
   {
     selector: 'edge.label',
     style: {
       'line-color': 'orange',
       'target-arrow-color': 'orange'
-    } as any
+    }
   }
 ];
 
