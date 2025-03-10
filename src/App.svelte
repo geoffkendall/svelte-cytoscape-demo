@@ -1,9 +1,20 @@
-<script>
+<script lang="ts">
   import Graph from './components/Graph.svelte'
-  import GraphNode from './components/GraphNode.svelte'
-  import GraphEdge from './components/GraphEdge.svelte'
+  
+  // Define types using type aliases instead of interfaces
+  type Node = {
+    id: string;
+    label: string;
+  };
 
-  const nodes = [
+  type Edge = {
+    id: string;
+    source: string;
+    target: string;
+    label?: string;
+  };
+
+  const nodes: Node[] = [
     { id: 'N1', label: 'Start' },
     { id: 'N2', label: '4' },
     { id: 'N4', label: '8' },
@@ -12,9 +23,9 @@
     { id: 'N6', label: '23' },
     { id: 'N7', label: '42' },
     { id: 'N8', label: 'End' }
-  ]
+  ];
 
-  const edges = [
+  const edges: Edge[] = [
     { id: 'E1', source: 'N1', target: 'N2' },
     { id: 'E2', source: 'N2', target: 'N3' },
     { id: 'E3', source: 'N3', target: 'N6' },
@@ -25,15 +36,7 @@
     { id: 'E8', source: 'N6', target: 'N7' },
     { id: 'E9', source: 'N7', target: 'N7', label: '3' },
     { id: 'E10', source: 'N7', target: 'N8' }
-  ]
+  ];
 </script>
 
-<Graph>
-  {#each nodes as node}
-    <GraphNode node={node}/>
-  {/each}
-
-  {#each edges as edge}
-    <GraphEdge edge={edge}/>
-  {/each}
-</Graph>
+<Graph {nodes} {edges} />

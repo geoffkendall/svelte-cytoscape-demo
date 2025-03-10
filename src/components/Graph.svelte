@@ -1,39 +1,95 @@
-<script>
-  import { onMount, setContext } from 'svelte'
-  import cytoscape from 'cytoscape'
-  import dagre from 'cytoscape-dagre'
-  import GraphStyles from './GraphStyles.js'
+<script lang="ts">
+  import { onMount, setContext } from "svelte";
+  import cytoscape from "cytoscape";
+  // Type assertion to handle extension registration
+  const cytoscapeWithExtensions = cytoscape as any;
+  import dagre from "cytoscape-dagre";
+  import cola from "cytoscape-cola";
+  import GraphStyles from "./GraphStyles";
 
-  setContext('graphSharedState', {
-    getCyInstance: () => cyInstance
-  })
+  // Define TypeScript types
+  type Node = {
+    id: string;
+    label: string;
+  };
 
-  let refElement = null
-  let cyInstance = null
+  type Edge = {
+    id: string;
+    source: string;
+    target: string;
+    label?: string;
+  };
+
+  // Export props with types
+  export let nodes: Node[] = [];
+  export let edges: Edge[] = [];
+
+  setContext("graphSharedState", {
+    getCyInstance: () => cyInstance,
+  });
+
+  let refElement: HTMLElement | null = null;
+  let cyInstance: any = null;
+
+  // Cola layout configuration with proper types
+  const colaLayoutOptions: any = {
+    name: "cola",
+    animate: true,
+    animationDuration: 1000,
+    avoidOverlap: true,
+    maxSimulationTime: 4000,
+    nodeSpacing: 40,
+    padding: 80,
+    edgeLength: 180,
+    unconstrIter: 20,
+    userConstIter: 25,
+    allConstIter: 30,
+    fit: true,
+    handleDisconnected: true,
+    infinite: false,
+    randomize: false,
+    refresh: 2
+  };
 
   onMount(() => {
-    cytoscape.use(dagre)
+    // Register the layout extensions
+    cytoscapeWithExtensions.use(dagre);
+    cytoscapeWithExtensions.use(cola);
 
-    cyInstance = cytoscape({
+    // Format elements for Cytoscape
+    const elements: any[] = [];
+    
+    // Add nodes
+    nodes.forEach((node: Node) => {
+      elements.push({
+        group: 'nodes',
+        data: { ...node }
+      });
+    });
+    
+    // Add edges
+    edges.forEach((edge: Edge) => {
+      elements.push({
+        group: 'edges',
+        data: { ...edge }
+      });
+    });
+
+    // Initialize cytoscape with all elements at once
+    cyInstance = cytoscapeWithExtensions({
       container: refElement,
-      style: GraphStyles
-    })
+      elements: elements,
+      style: GraphStyles as any,
+      layout: colaLayoutOptions
+    });
 
-    cyInstance.on('add', () => {
-      cyInstance
-        .makeLayout({
-          name: 'dagre',
-          rankDir: 'TB',
-          nodeSep: 150
-        })
-        .run()
-    })
-  })
-
+    // Force layout to run again after a short delay to ensure edges are visible
+    setTimeout(() => {
+      if (cyInstance) {
+        cyInstance.layout(colaLayoutOptions).run();
+      }
+    }, 500);
+  });
 </script>
 
-<div class="graph" bind:this={refElement}>
-  {#if cyInstance}
-    <slot></slot>
-  {/if}
-</div>
+<div class="graph" bind:this={refElement}></div>
